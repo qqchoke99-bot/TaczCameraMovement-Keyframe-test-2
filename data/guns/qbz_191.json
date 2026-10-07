@@ -1,0 +1,49 @@
+{
+  "id": "qbz_191",
+  "aliases": [
+    "krep:qbz_191",
+    "krep_qbz_191"
+  ],
+  "crawl_recoil_multiplier": 0.5,
+  "recoil": {
+    "pitch": [
+      {
+        "time": 0,
+        "value": [
+          0.4,
+          0.4
+        ]
+      },
+      {
+        "time": 0.25,
+        "value": [
+          -0.125,
+          -0.125
+        ]
+      },
+      {
+        "time": 0.33,
+        "value": [
+          0,
+          0
+        ]
+      }
+    ],
+    "yaw": [
+      {
+        "time": 0,
+        "value": [
+          -0.25,
+          0.25
+        ]
+      },
+      {
+        "time": 0.33,
+        "value": [
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}

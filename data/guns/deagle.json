@@ -1,0 +1,70 @@
+{
+  "id": "deagle",
+  "aliases": [
+    "krep:deagle",
+    "krep_deagle"
+  ],
+  "crawl_recoil_multiplier": 0.75,
+  "recoil": {
+    "pitch": [
+      {
+        "time": 0,
+        "value": [
+          0.95,
+          0.95
+        ]
+      },
+      {
+        "time": 0.4,
+        "value": [
+          0.95,
+          0.95
+        ]
+      },
+      {
+        "time": 0.65,
+        "value": [
+          -0.225,
+          -0.225
+        ]
+      },
+      {
+        "time": 0.85,
+        "value": [
+          0.125,
+          0.125
+        ]
+      },
+      {
+        "time": 1.1,
+        "value": [
+          0,
+          0
+        ]
+      },
+      {
+        "time": 1.2,
+        "value": [
+          0,
+          0
+        ]
+      }
+    ],
+    "yaw": [
+      {
+        "time": 0,
+        "value": [
+          -0.3,
+          0.3
+        ]
+      },
+      {
+        "time": 0.5,
+        "value": [
+          0,
+          0
+        ]
+      }
+    ]
+  }
+}

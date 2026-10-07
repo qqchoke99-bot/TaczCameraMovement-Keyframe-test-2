@@ -1,35 +1,35 @@
 {
-  "id": "aa12",
+  "id": "aug",
   "aliases": [
-    "krep:aa12",
-    "krep_aa12"
+    "krep:aug",
+    "krep_aug"
   ],
-  "crawl_recoil_multiplier": 0.5,
+  "crawl_recoil_multiplier": 0.75,
   "recoil": {
     "pitch": [
       {
         "time": 0,
         "value": [
-          0.25,
-          0.25
+          0.375,
+          0.375
         ]
       },
       {
-        "time": 0.125,
+        "time": 0.1875,
         "value": [
-          0.25,
-          0.25
-        ]
-      },
-      {
-        "time": 0.4,
-        "value": [
-          -0.25,
-          -0.25
+          0.375,
+          0.375
         ]
       },
       {
         "time": 0.55,
+        "value": [
+          -0.125,
+          -0.125
+        ]
+      },
+      {
+        "time": 0.7,
         "value": [
           0,
           0
@@ -40,26 +40,19 @@
       {
         "time": 0,
         "value": [
-          -0.5,
-          0.5
+          -0.25,
+          0.25
         ]
       },
       {
         "time": 0.1,
         "value": [
-          -0.5,
-          0.5
+          -0.2,
+          0.25
         ]
       },
       {
-        "time": 0.2,
-        "value": [
-          0.15,
-          0.15
-        ]
-      },
-      {
-        "time": 0.4,
+        "time": 0.5,
         "value": [
           0,
           0

@@ -1,35 +1,42 @@
 {
-  "id": "aa12",
+  "id": "glock_17",
   "aliases": [
-    "krep:aa12",
-    "krep_aa12"
+    "krep:g17",
+    "krep_g17"
   ],
-  "crawl_recoil_multiplier": 0.5,
+  "crawl_recoil_multiplier": 0.75,
   "recoil": {
     "pitch": [
       {
         "time": 0,
         "value": [
-          0.25,
-          0.25
+          1,
+          1
         ]
       },
       {
-        "time": 0.125,
+        "time": 0.08,
         "value": [
-          0.25,
-          0.25
+          0.9,
+          0.9
         ]
       },
       {
-        "time": 0.4,
+        "time": 0.26,
         "value": [
-          -0.25,
-          -0.25
+          0.1,
+          0.1
         ]
       },
       {
-        "time": 0.55,
+        "time": 0.3,
+        "value": [
+          0.05,
+          0.05
+        ]
+      },
+      {
+        "time": 0.35,
         "value": [
           0,
           0
@@ -40,26 +47,12 @@
       {
         "time": 0,
         "value": [
-          -0.5,
-          0.5
-        ]
-      },
-      {
-        "time": 0.1,
-        "value": [
-          -0.5,
+          -0.75,
           0.5
         ]
       },
       {
         "time": 0.2,
-        "value": [
-          0.15,
-          0.15
-        ]
-      },
-      {
-        "time": 0.4,
         "value": [
           0,
           0

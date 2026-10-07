@@ -1,35 +1,35 @@
 {
-  "id": "aa12",
+  "id": "hk_mp5a5",
   "aliases": [
-    "krep:aa12",
-    "krep_aa12"
+    "krep:mp5",
+    "krep_mp5"
   ],
-  "crawl_recoil_multiplier": 0.5,
+  "crawl_recoil_multiplier": 0.75,
   "recoil": {
     "pitch": [
       {
         "time": 0,
         "value": [
-          0.25,
-          0.25
+          0.45,
+          0.45
         ]
       },
       {
-        "time": 0.125,
+        "time": 0.3,
         "value": [
-          0.25,
-          0.25
+          0.45,
+          0.45
         ]
       },
       {
-        "time": 0.4,
+        "time": 0.5,
         "value": [
-          -0.25,
-          -0.25
+          -0.125,
+          -0.125
         ]
       },
       {
-        "time": 0.55,
+        "time": 0.65,
         "value": [
           0,
           0
@@ -40,26 +40,19 @@
       {
         "time": 0,
         "value": [
-          -0.5,
-          0.5
+          -0.275,
+          0.275
         ]
       },
       {
-        "time": 0.1,
+        "time": 0.3,
         "value": [
-          -0.5,
-          0.5
+          -0.275,
+          0.275
         ]
       },
       {
-        "time": 0.2,
-        "value": [
-          0.15,
-          0.15
-        ]
-      },
-      {
-        "time": 0.4,
+        "time": 0.5,
         "value": [
           0,
           0
