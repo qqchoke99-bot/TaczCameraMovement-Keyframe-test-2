@@ -1,1 +1,8 @@
-
+{
+  "enabled": true,
+  "enableRecoil": true,
+  "enableInspect": true,
+  "globalIntensity": 1.0,
+  "inspectIntensity": 1.0,
+  "adsMultiplier": 0.75
+}
