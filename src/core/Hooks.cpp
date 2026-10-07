@@ -1,27 +1,35 @@
+#include "core/Hooks.hpp"
 #include "module/RecoilModule.hpp"
 
 #include <pl/memory/Hook.hpp>
 #include <pl/memory/Signature.hpp>
+
 #include <android/log.h>
 #include <atomic>
 #include <chrono>
+#include <string>
+#include <vector>
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "RecoilExpand", __VA_ARGS__)
+#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "RecoilExpand", __VA_ARGS__)
 
 namespace {
 
-// CameraBlendSystemTick — same AOB used by CameraOverhaul / Natural-Camera 1.26.50+
-// F4 4F 06 A9 FD 03 01 91 54 D0 3B D5 ... (fn Multiplayer camera systems path)
-// Prefer resolve via string-backed sig if available; fallback pattern below.
+// CameraBlendSystemTick — pattern from CameraOverhaul / Natural-Camera (1.26.50+)
+constexpr const char* kCameraBlendPattern =
+    "? ? ? D1 ? ? ? 6D ? ? ? 6D ? ? ? 6D ? ? ? 6D ? ? ? A9 ? ? ? F9 ? ? ? A9 ? ? ? A9 ? ? ? 91 "
+    "55 D0 3B D5 F3 03 01 AA F4 03 00 AA ? ? ? F9 ? ? ? 91 ? ? ? 91";
 
 using CameraBlendFn = void (*)(void* component, void* blendState, float factor);
 CameraBlendFn g_origCameraBlend = nullptr;
 
-std::chrono::steady_clock::time_point g_last;
+std::chrono::steady_clock::time_point g_last{};
 std::atomic<bool> g_hooked{false};
 
 void hookedCameraBlend(void* component, void* blendState, float factor) {
-    if (g_origCameraBlend) g_origCameraBlend(component, blendState, factor);
+    if (g_origCameraBlend) {
+        g_origCameraBlend(component, blendState, factor);
+    }
 
     using clock = std::chrono::steady_clock;
     const auto now = clock::now();
@@ -36,39 +44,42 @@ void hookedCameraBlend(void* component, void* blendState, float factor) {
     recoilexpand::RecoilModule::get().onCameraBlend(component, dt);
 }
 
-// Optional: detect scoreboard/tag via command is done from BP.
-// Native side also exposes a simple test: holding is not required for first version.
-
 } // namespace
 
 namespace recoilexpand::hooks {
 
 bool install() {
-    // Signature from CameraOverhaul CameraBlendSystemTick (1.26.50 family)
-    static const char* kSig =
-        "F4 4F 06 A9 FD 03 01 91 54 D0 3B D5 F3 03 00 AA 88 ?? ?? F9 A8 83 1F F8 "
-        "?? ?? ?? D0 08 A1 11 91 08 FD DF 08 ?? ?? ?? ?? ?? ?? ?? D0 21 E0 0C 91 "
-        "E0 63 00 91 ?? ?? ?? 95";
+    if (g_hooked.load()) return true;
 
-    auto resolved = pl::memory::resolveSignature(kSig);
-    if (!resolved) {
-        LOGI("CameraBlend signature not found — recoil camera hook skipped");
+    // pl::memory::resolveSignatures(patterns, library) — same API as CameraOverhaul
+    std::vector<std::string> patterns{kCameraBlendPattern};
+    const auto resolved = pl::memory::resolveSignatures(patterns, "libminecraftpe.so");
+
+    const auto it = resolved.find(kCameraBlendPattern);
+    if (it == resolved.end() || it->second == 0) {
+        LOGE("CameraBlendSystemTick signature not found");
         return false;
     }
 
-    const bool ok = pl::memory::hook(
-        resolved,
-        reinterpret_cast<void*>(hookedCameraBlend),
-        reinterpret_cast<void**>(&g_origCameraBlend),
-        pl::memory::HookPriority::Normal);
+    void* target = reinterpret_cast<void*>(it->second);
 
-    g_hooked = ok;
-    LOGI("CameraBlend hook %s", ok ? "OK" : "FAIL");
-    return ok;
+    // pl::memory::hook(target, detour, original*) returns 0 on success
+    const int rc = pl::memory::hook(
+        target,
+        reinterpret_cast<void*>(hookedCameraBlend),
+        reinterpret_cast<void**>(&g_origCameraBlend));
+
+    if (rc != 0 || g_origCameraBlend == nullptr) {
+        LOGE("CameraBlend hook failed rc=%d", rc);
+        return false;
+    }
+
+    g_hooked = true;
+    LOGI("CameraBlendSystemTick hooked @ %p", target);
+    return true;
 }
 
 void uninstall() {
-    // preloader unhooks on unload in most builds
     g_hooked = false;
 }
 

@@ -1,31 +1,34 @@
-#include <filesystem>
+#include "core/TriggerPoll.hpp"
 #include "module/RecoilModule.hpp"
+
 #include <android/log.h>
+#include <atomic>
+#include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <thread>
-#include <atomic>
-#include <chrono>
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "RecoilExpand", __VA_ARGS__)
 
-// Side-channel triggers (BP / mcfunction / script writes these files):
-//   /sdcard/games/RecoilExpand/trigger/fire.txt     content = gun id (e.g. krep_akm or ak47)
-//   /sdcard/games/RecoilExpand/trigger/inspect.txt  content = style (default|rifle|pistol)
-// File is deleted after consume.
-
 namespace recoilexpand::trigger {
 
+namespace {
 std::atomic<bool> g_run{false};
 std::thread g_th;
+}
 
 void pollLoop() {
     namespace fs = std::filesystem;
     const fs::path firePath = "/sdcard/games/RecoilExpand/trigger/fire.txt";
     const fs::path inspectPath = "/sdcard/games/RecoilExpand/trigger/inspect.txt";
-    fs::create_directories("/sdcard/games/RecoilExpand/trigger");
 
-    while (g_run) {
+    try {
+        fs::create_directories("/sdcard/games/RecoilExpand/trigger");
+    } catch (...) {
+    }
+
+    while (g_run.load()) {
         try {
             if (fs::exists(firePath)) {
                 std::ifstream in(firePath);
@@ -45,7 +48,8 @@ void pollLoop() {
                 std::getline(in, style);
                 in.close();
                 fs::remove(inspectPath);
-                while (!style.empty() && (style.back() == '\r' || style.back() == '\n' || style.back() == ' '))
+                while (!style.empty() &&
+                       (style.back() == '\r' || style.back() == '\n' || style.back() == ' '))
                     style.pop_back();
                 if (style.empty()) style = "default";
                 RecoilModule::get().triggerInspect(style);
@@ -57,8 +61,7 @@ void pollLoop() {
 }
 
 void start() {
-    if (g_run) return;
-    g_run = true;
+    if (g_run.exchange(true)) return;
     g_th = std::thread(pollLoop);
     g_th.detach();
     LOGI("trigger poller started");
