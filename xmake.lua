@@ -34,3 +34,25 @@ target("RecoilExpand")
                     "-Wl,--hash-style=gnu", "-Wl,-z,max-page-size=16384")
         add_links("android", "log", "EGL")
     end
+
+    after_build(function (target)
+        if not target:is_plat("android") then return end
+        import("lib.detect.find_tool")
+        local python = find_tool("python3") or find_tool("python")
+        local args = {}
+        if not python then
+            python = find_tool("py")
+            if python then table.insert(args, "-3") end
+        end
+        assert(python, "Python 3 is required to package RecoilExpand.levipack")
+        table.insert(args, path.join(os.projectdir(), "scripts", "package_levipack.py"))
+        table.insert(args, "--library")
+        table.insert(args, target:targetfile())
+        table.insert(args, "--icon")
+        table.insert(args, path.join(os.projectdir(), "assets", "icon.png"))
+        table.insert(args, "--version-header")
+        table.insert(args, path.join(os.projectdir(), "include", "Version.hpp"))
+        table.insert(args, "--output")
+        table.insert(args, path.join(target:targetdir(), "RecoilExpand.levipack"))
+        os.vrunv(python.program, args)
+    end)
