@@ -7,29 +7,38 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO, "RecoilExpand", __VA_ARGS__)
 
-class RecoilExpandMod : public pl::Mod {
+class RecoilExpandMod {
 public:
-    bool load() override {
+    static RecoilExpandMod& instance() {
+        static RecoilExpandMod mod;
+        return mod;
+    }
+
+    bool load(pl::mod::ModContext&) {
         LOGI("load");
         return true;
     }
 
-    bool enable() override {
+    bool enable(pl::mod::ModContext&) {
         LOGI("enable");
-        auto& mod = recoilexpand::RecoilModule::get();
-        mod.init();
+        recoilexpand::RecoilModule::get().init();
         recoilexpand::hooks::install();
         recoilexpand::trigger::start();
         return true;
     }
 
-    bool disable() override {
+    bool disable(pl::mod::ModContext&) {
         LOGI("disable");
         recoilexpand::trigger::stop();
         recoilexpand::hooks::uninstall();
         recoilexpand::RecoilModule::get().shutdown();
         return true;
     }
+
+    bool unload(pl::mod::ModContext&) {
+        LOGI("unload");
+        return true;
+    }
 };
 
-PL_REGISTER_MOD(RecoilExpandMod)
+PL_REGISTER_MOD(RecoilExpandMod, RecoilExpandMod::instance())
