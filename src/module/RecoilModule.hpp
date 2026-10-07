@@ -41,7 +41,7 @@ public:
     // config
     bool m_enableRecoil{true};
     bool m_enableInspect{true};
-    float m_globalIntensity{1.f};
+    float m_globalIntensity{1.5f};
     float m_inspectIntensity{1.f};
     float m_adsMultiplier{0.75f}; // when tag tacz_recoil_ads present
     std::string m_dataPath{"/sdcard/games/RecoilExpand"};
