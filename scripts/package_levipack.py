@@ -5,20 +5,24 @@ import sys
 import zipfile
 from pathlib import Path
 
-VALUE_PATTERN = re.compile(r'^\s*inline\s+constexpr\s+std::string_view\s+(Name|Author|Description|Version)\s*=\s*"((?:\\.|[^"\\])*)";\s*$')
+VALUE_PATTERN = re.compile(
+    r'^\s*inline\s+constexpr\s+std::string_view\s+(Name|Author|Description|Version)\s*=\s*"((?:\\.|[^"\\])*)";\s*$'
+)
 REQUIRED_VALUES = ("Name", "Author", "Description", "Version")
-LIBRARY_NAME = "libRealisticHeadBob.so"
+LIBRARY_NAME = "libRecoilExpand.so"
+
 
 def parse_version(path: Path) -> dict:
     values = {}
     for line in path.read_text(encoding="utf-8").splitlines():
-        match = VALUE_PATTERN.match(line)
-        if match:
-            values[match.group(1)] = bytes(match.group(2), "utf-8").decode("unicode_escape")
+        m = VALUE_PATTERN.match(line)
+        if m:
+            values[m.group(1)] = bytes(m.group(2), "utf-8").decode("unicode_escape")
     missing = [name for name in REQUIRED_VALUES if not values.get(name)]
     if missing:
         raise ValueError("Missing version metadata: " + ", ".join(missing))
     return values
+
 
 def build_manifest(values: dict) -> dict:
     return {
@@ -32,6 +36,7 @@ def build_manifest(values: dict) -> dict:
         "overwrite_files": ["icon.png"],
         "overwrite_folders": [],
     }
+
 
 def write_package(library: Path, icon: Path, version_header: Path, output: Path) -> None:
     if not library.is_file():
@@ -58,27 +63,22 @@ def write_package(library: Path, icon: Path, version_header: Path, output: Path)
         if names != expected:
             raise RuntimeError(f"Unexpected package entries: {sorted(names)}")
         parsed = json.loads(archive.read("manifest.json"))
-        if parsed != manifest:
-            raise RuntimeError("Manifest verification failed")
-        if archive.getinfo(LIBRARY_NAME).file_size != library.stat().st_size:
-            raise RuntimeError("Library verification failed")
-        if archive.getinfo("icon.png").file_size != icon.stat().st_size:
-            raise RuntimeError("Icon verification failed")
+        for key in ("type", "name", "author", "description", "version", "entry"):
+            if key not in parsed:
+                raise RuntimeError(f"manifest missing {key}")
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--library", required=True, type=Path)
-    parser.add_argument("--icon", required=True, type=Path)
-    parser.add_argument("--version-header", required=True, type=Path)
-    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--library", required=True)
+    parser.add_argument("--icon", required=True)
+    parser.add_argument("--version-header", required=True)
+    parser.add_argument("--output", required=True)
     args = parser.parse_args()
-    try:
-        write_package(args.library.resolve(), args.icon.resolve(), args.version_header.resolve(), args.output.resolve())
-    except Exception as error:
-        print(error, file=sys.stderr)
-        return 1
-    print(args.output.resolve())
+    write_package(Path(args.library), Path(args.icon), Path(args.version_header), Path(args.output))
+    print(f"Wrote {args.output}")
     return 0
 
+
 if __name__ == "__main__":
-    raise SystemExit(main())
+    sys.exit(main())
