@@ -1,0 +1,7 @@
+{
+  "name": "RecoilExpand",
+  "version": "1.0.0",
+  "description": "Java-style TACZ recoil + inspect camera keyframes for Levi Launcher",
+  "author": "port",
+  "minecraft": ["1.26.50", "1.26.52"]
+}
